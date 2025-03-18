@@ -120,7 +120,7 @@ moviepy==1.0.3
 mpmath==1.3.0
 msgpack==1.1.0
 multidict==5.2.0
-
+pymysql
 namex==0.0.8
 networkx==2.6.3
 nltk==3.8.1
