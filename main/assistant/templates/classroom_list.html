@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classroom Details</title>
+    <style>
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 20px;
+            width: 40%;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .close {
+            float: right;
+            font-size: 20px;
+            cursor: pointer;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto', sans-serif;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .sidebar {
+            width: 230px;
+            background: #d3d3d3;
+            color: black;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            position: fixed;
+            left: -230px;
+            top: 10px;
+            height: 100vh;
+            transition: 0.3s;
+        }
+        
+        .sidebar.active {
+            left: 0;
+        }
+        
+        .sidebar h2 {
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            text-align: center;
+            width: 100%;
+        }
+        
+        /* Sidebar Menu */
+        .menu {
+            width: 100%;
+            list-style: none;
+        }
+        
+        .menu li {
+            width: 100%;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: 0.3s;
+            border-bottom: 1px solid black;
+            font-size: 0.9em;
+        }
+        .menu li a {
+            text-decoration: none; /* Remove underline */
+            color: inherit; /* Inherit text color from parent */
+            display: block; /* Make the entire list item clickable */
+            width: 100%;
+        }
+        .menu li:hover,
+        .menu li.active {
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 6px;
+        }
+        
+        /* User Info */
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: black;
+            margin-right: 900px;
+        }
+        
+        .user-info img {
+            width: 40px;
+            height: 40px;
+            border: 2px solid white;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        .user-info span {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            transition: margin-left 0.3s;
+        }
+        
+        .main-content.shifted {
+            margin-left: 230px;
+        }
+        
+        /* Navbar */
+        .navbar {
+            width: 100%;
+            background: #FF8C00;
+            color: white;
+            padding: 12px 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+        
+        .menu-icon {
+            font-size: 20px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            color: white;
+        }
+        
+        /* Navigation Actions */
+        .nav-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        /* Logout Button */
+        .logout-btn {
+            background: white;
+            color: #1a73e8;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        /* Delete Account Button */
+        .delete-account-btn {
+            background: #ff4d4d;
+            color: white;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .delete-account-btn:hover {
+            background: #cc0000;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 100px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .students-section {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+        
+        .students-section h2 {
+            margin-top: 0;
+            color: #333;
+        }
+        
+        .students-section ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        
+        .students-section li {
+            padding: 5px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .classwork-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .classwork-item {
+            background: #fff;
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .classwork-item h3 {
+            margin: 0 0 10px;
+            color: #ff8c00;
+        }
+
+        .classwork-item p {
+            margin: 5px 0;
+            color: #555;
+        }
+
+        .download-btn {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 8px 12px;
+            background: #28a745;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+
+        .download-btn:hover {
+            background: #218838;
+        }
+        /* 🔸 Modal Background */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* 🔸 Modal Content */
+        .modal-content {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 90vw;
+            max-height: 90vh;
+            top:10px;
+            position: relative;
+            text-align: center;
+        }
+
+        /* 🔸 Scrollable Body */
+        .modal-body {
+            max-height: 80vh; /* Restrict modal height */
+            overflow-y: auto; /* Enable scrolling */
+            padding: 10px;
+        }
+
+        /* 🔸 Close Button */
+        .close {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            font-size: 30px;
+            cursor: pointer;
+        }
+
+        /* 🔸 File Viewers (Common Styles) */
+        .file-viewer {
+            display: block;
+            max-width: 100%;
+            max-height: 60vh; /* Ensures content is scrollable */
+            margin: auto;
+        }
+
+        /* 🔸 PDF Canvas */
+        #pdfCanvas {
+            width: 100%;
+            border: 1px solid #ddd;
+        }
+
+        /* 🔸 PPT Viewer */
+        #pptViewer {
+            width: 100%;
+            height: 80vh;
+        }
+
+        /* 🔸 Image Viewer */
+        #imageViewer {
+            width: auto;
+            max-width: 100%;
+            max-height: 80vh;
+        }
+
+        .file-icon {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <h2>EduSync AI</h2>
+        <ul class="menu">
+            <li><a href="/home"> Home</a></li>
+            <li> Settings</li>
+        </ul>
+    </div>
+
+    <!-- Navbar -->
+    <div class="navbar">
+        <button class="menu-icon" onclick="toggleSidebar()">☰</button>
+        <div class="user-info">
+            <img id="profileImage" src="/static/default-profile.png" alt="Profile">
+            <span id="userName">Loading...</span>
+        </div>
+        
+        <form action="{% url 'logout' %}" method="post">
+            {% csrf_token %}
+            <button type="submit" class="logout-btn">Logout</button>
+        </form>
+        <button class="delete-account-btn" onclick="confirmDeleteAccount()">Delete Account</button>
+    </div>
+
+
+    <div class="container">
+        <h1>Classroom Details</h1>
+    
+        <!-- Class Information Section -->
+        <div class="class-info">
+            <p><strong>Class Name:</strong> {{ classroom.name }}</p>
+            <p><b><strong>Class Subject:</b></strong> {{ classroom.subject }}</p>
+            <p><strong>Class Code:</strong> {{ classroom.unique_code }}</p>
+            <p><strong>Created By:</strong> {{ classroom.teacher.get_full_name }}</p>
+        </div>
+    
+        <!-- List of Joined Students -->
+        <div class="students-section">
+            <h2>Joined Students</h2>
+            {% if classroom.students.all %}
+                <ul>
+                    {% for student in classroom.students.all %}
+                        <li>{{ student.get_full_name }} ({{ student.username }})</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No students have joined this class yet.</p>
+            {% endif %}
+        </div>
+    
+        <!-- Action Buttons: Show Only if the User is the Teacher -->
+        {% if request.user == classroom.teacher %}
+            <div class="button-group">
+                <a class="edit-btn">Edit Classroom</a>
+                <button class="delete-btn" onclick="confirmDelete()">Delete Classroom</button>
+                <button class="add-work-btn" onclick="openAddWorkModal()">Add Work</button>
+            </div>
+        {% endif %}
+        {% if request.user != classroom.teacher %}
+            <button class="leave-btn" onclick="confirmLeave()">Leave Classroom</button>
+        {% endif %}
+        
+    </div>
+    <div id="addWorkModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeAddWorkModal()">&times;</span>
+            <h2>Add Classwork</h2>
+            <form id="addWorkForm" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label for="title">Title:</label>
+                    <input type="text" id="title" name="title" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="description">Description:</label>
+                    <textarea id="description" name="description" required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="file">Attach File (optional):</label>
+                    <input type="file" id="file" name="file">
+                </div>
+    
+                <button type="submit" class="submit-btn">Submit</button>
+                <button type="button" class="cancel-btn" onclick="closeAddWorkModal()">Cancel</button>
+            </form>
+        </div>
+    </div>
+    <div class="container">
+        <h2>Classroom: {{ classroom.name }}</h2>
+        <p><strong>Teacher:</strong> {{ classroom.teacher.username }}</p>
+    
+        <h3>Classwork</h3>
+        <button id="fetch-classwork" class="btn btn-primary">🔄 Load Classwork</button>
+        
+        <ul id="classwork-container"></ul>
+    </div>
+    
+    <div id="fileModal" class="modal">
+        <div class="modal-content">
+            <span id="closeModal" class="close">&times;</span>
+    
+            <!-- Scrollable Viewer Container -->
+            <div class="modal-body">
+                <!-- PDF Viewer -->
+                <div id="pdfViewerContainer" class="file-viewer" style="display: none;">
+                    <canvas id="pdfCanvas"></canvas>
+                    <div>
+                        <button id="prevPage">⬅ Prev</button>
+                        <span id="pageNum">1</span> / <span id="pageCount">?</span>
+                        <button id="nextPage">Next ➡</button>
+                    </div>
+                </div>
+    
+                <!-- PPT Viewer -->
+                <iframe id="pptViewer" class="file-viewer" style="display: none;" frameborder="0"></iframe>
+    
+                <!-- Image Viewer -->
+                <img id="imageViewer" class="file-viewer" src="" alt="Image Preview" style="display: none;">
+            </div>
+        </div>
+    </div>
+    
+    
+
+    
+    
+    
+    
+
+    <script>
+        
+        function confirmLeave() {
+            if (confirm("Are you sure you want to leave this classroom?")) {
+                window.location.href = "{% url 'leave_classroom' classroom.unique_code %}";
+            }
+        }
+        function openAddWorkModal() {
+            document.getElementById("addWorkModal").style.display = "block";
+        }
+    
+        function closeAddWorkModal() {
+            document.getElementById("addWorkModal").style.display = "none";
+        }
+        document.addEventListener("DOMContentLoaded", function () {
+            const form = document.getElementById("addWorkForm");
+            form.addEventListener("submit", async function (e) {
+                e.preventDefault();
+    
+                let formData = new FormData(form);
+                let classroomId = "{{ classroom.id }}";  
+                let url = "{% url 'add_classwork' classroom.id %}";
+
+    
+                let csrfToken = document.querySelector("[name=csrfmiddlewaretoken]").value;
+    
+                try {
+                    let response = await fetch(url, {
+                        method: "POST",
+                        body: formData,
+                        headers: {
+                            "X-CSRFToken": csrfToken
+                        }
+                    });
+    
+                    let data = await response.json();
+                    if (response.ok) {
+                        alert("Classwork added successfully!");
+                        closeAddWorkModal();
+                        location.reload();
+                    } else {
+                        alert(data.error || "An error occurred");
+                    }
+                } catch (error) {
+                    console.error("Error submitting form:", error);
+                    alert("An error occurred. Please try again.");
+                }
+            });
+        });
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
+        }
+
+        document.addEventListener("DOMContentLoaded", async function () {
+            try {
+                const response = await fetch("{% url 'get_user_profile' %}");
+                const data = await response.json();
+    
+                if (response.ok) {
+                    document.getElementById("userName").textContent = "Welcome, " + data.first_name + " " + data.last_name;
+                    
+                    const profileImage = document.getElementById("profileImage");
+                    if (data.profile_picture) {
+                        profileImage.src = data.profile_picture;
+                    } else {
+                        profileImage.src = "/static/default-profile.png";
+                    }
+                } else {
+                    console.error("Error fetching user profile:", data.error);
+                }
+            } catch (error) {
+                console.error("Error loading profile:", error);
+            }
+        });
+        document.addEventListener("DOMContentLoaded", function () {
+            document.getElementById("fetch-classwork").addEventListener("click", function () {
+                let classroomId = "{{ classroom.id }}";
+        
+                fetch(`/classroom/${classroomId}/view_work/`, {
+                    method: "GET",
+                    headers: { "X-Requested-With": "XMLHttpRequest" }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log("Received data:", data);
+        
+                    let classworkContainer = document.getElementById("classwork-container");
+                    classworkContainer.innerHTML = "";
+        
+                    if (!data.classworks || data.classworks.length === 0) {
+                        classworkContainer.innerHTML = "<p style='color: red;'>🚨 No classwork available.</p>";
+                    } else {
+                        data.classworks.forEach(work => {
+                            let fileIcon = "";
+                            let fileUrl = work.file_url ? new URL(work.file_url, window.location.origin).href : null;
+                            let fileExtension = fileUrl ? fileUrl.split('.').pop().toLowerCase() : "";
+        
+                            console.log("File URL:", fileUrl);
+        
+                            if (fileUrl) {
+                                if (fileExtension === "pdf") {
+                                    fileIcon = `<img src="https://upload.wikimedia.org/wikipedia/commons/8/87/PDF_file_icon.svg" 
+                                                    class="file-icon" 
+                                                    onclick="openPDF('${fileUrl}')" 
+                                                    alt="PDF Icon">`;
+                                } else if (["jpg", "jpeg", "png", "gif", "bmp", "webp"].includes(fileExtension)) {
+                                    fileIcon = `<img src="${fileUrl}" 
+                                                    class="file-icon" 
+                                                    onclick="openImage('${fileUrl}')" 
+                                                    alt="Image Preview">`;
+                                } else if (["ppt", "pptx"].includes(fileExtension)) {
+                                    fileIcon = `<img src="https://upload.wikimedia.org/wikipedia/commons/3/3b/Microsoft_PowerPoint_Logo.png" 
+                                                    class="file-icon" 
+                                                    onclick="openPPT('${fileUrl}')" 
+                                                    alt="PPT Icon">`;
+                                } else {
+                                    fileIcon = `<a href="${fileUrl}" target="_blank" download>📄 Download File</a>`;
+                                }
+                            } else {
+                                fileIcon = "<p>No file attached.</p>";
+                            }
+        
+                            let listItem = document.createElement("li");
+                            listItem.innerHTML = `
+                                <strong>${work.title}</strong> - ${work.description}
+                                <br>
+                                <small>Created on: ${work.created_at}</small>
+                                <br>
+                                ${fileIcon}
+                                <hr>
+                            `;
+                            classworkContainer.appendChild(listItem);
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error("Error loading classwork:", error);
+                    alert("Error fetching classwork. Please try again.");
+                });
+            });
+        });
+        
+        // 📌 Open PDF using PDF.js
+        let pdfDoc = null,
+            pageNum = 1,
+            pageRendering = false,
+            pdfCanvas = document.getElementById("pdfCanvas"),
+            pdfCtx = pdfCanvas.getContext("2d");
+        
+        function openPDF(pdfUrl) {
+            let modal = document.getElementById("fileModal");
+            document.getElementById("pdfViewerContainer").style.display = "block";
+            document.getElementById("pptViewer").style.display = "none";
+            document.getElementById("imageViewer").style.display = "none"; // Hide image viewer
+        
+            modal.style.display = "flex";
+        
+            pdfjsLib.getDocument(pdfUrl).promise.then(doc => {
+                pdfDoc = doc;
+                document.getElementById("pageCount").textContent = pdfDoc.numPages;
+                renderPage(pageNum);
+            });
+        }
+        
+        function renderPage(num) {
+            pageRendering = true;
+            pdfDoc.getPage(num).then(page => {
+                let viewport = page.getViewport({ scale: 1.5 });
+                pdfCanvas.height = viewport.height;
+                pdfCanvas.width = viewport.width;
+        
+                let renderContext = { canvasContext: pdfCtx, viewport: viewport };
+                let renderTask = page.render(renderContext);
+        
+                renderTask.promise.then(() => {
+                    pageRendering = false;
+                    document.getElementById("pageNum").textContent = num;
+                });
+            });
+        }
+        
+        document.getElementById("prevPage").addEventListener("click", function () {
+            if (pageNum > 1) {
+                pageNum--;
+                renderPage(pageNum);
+            }
+        });
+        
+        document.getElementById("nextPage").addEventListener("click", function () {
+            if (pageNum < pdfDoc.numPages) {
+                pageNum++;
+                renderPage(pageNum);
+            }
+        });
+        
+        // 📌 Open PPT in Microsoft Office Viewer (or Google Docs Viewer)
+        function openPPT(pptUrl) {
+            let modal = document.getElementById("fileModal");
+            let viewer = document.getElementById("pptViewer");
+        
+            // Microsoft Office Online Viewer API
+            viewer.src = `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(pptUrl)}`;
+        
+            // Alternative: Google Docs Viewer (Uncomment if needed)
+            // viewer.src = `https://docs.google.com/gview?url=${encodeURIComponent(pptUrl)}&embedded=true`;
+        
+            document.getElementById("pdfViewerContainer").style.display = "none";
+            document.getElementById("imageViewer").style.display = "none"; // Hide image viewer
+            viewer.style.display = "block";
+        
+            modal.style.display = "flex";
+        }
+        
+        // 📌 Open Image Directly in Modal
+        function openImage(imgUrl) {
+            let modal = document.getElementById("fileModal");
+            let viewer = document.getElementById("imageViewer");
+        
+            viewer.src = imgUrl;
+            document.getElementById("pdfViewerContainer").style.display = "none";
+            document.getElementById("pptViewer").style.display = "none";
+            viewer.style.display = "block";
+        
+            modal.style.display = "flex";
+        }
+        
+        // 📌 Close Modal
+        const modal = document.getElementById("fileModal");
+        const closeModal = document.getElementById("closeModal");
+        
+        // 📌 Function to close the modal
+        function closeFileModal() {
+            modal.style.display = "none";
+            document.getElementById("pdfViewerContainer").style.display = "none";
+            document.getElementById("pptViewer").style.display = "none";
+            document.getElementById("imageViewer").style.display = "none"; // Hide image viewer
+        }
+        
+        // 📌 Close modal on clicking 'X' button
+        closeModal.addEventListener("click", closeFileModal);
+        
+        // 📌 Close modal if clicked outside the content area
+        window.addEventListener("click", function (event) {
+            if (event.target === modal) {
+                closeFileModal();
+            }
+        });
+        
+        
+        
+        
+        
+        
+        
+        
+        
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EduSync.ai - AI Teacher Assistant</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+theme: {
+extend: {
+colors: {
+primary: '#6366f1',
+secondary: '#a855f7'
+},
+borderRadius: {
+'none': '0px',
+'sm': '4px',
+DEFAULT: '8px',
+'md': '12px',
+'lg': '16px',
+'xl': '20px',
+'2xl': '24px',
+'3xl': '32px',
+'full': '9999px',
+'button': '8px'
+}
+}
+}
+}
+</script>
+<style>
+:where([class^="ri-"])::before { content: "\f3c2"; }
+.modal {
+opacity: 0;
+visibility: hidden;
+transition: all 0.3s ease;
+}
+.modal.active {
+opacity: 1;
+visibility: visible;
+}
+</style>
+</head>
+<body class="bg-gray-900 text-gray-100">
+<div class="flex min-h-screen">
+<aside class="w-64 bg-gray-800 border-r border-gray-700 p-4 flex flex-col">
+<div class="mb-8">
+<h1 class="text-2xl font-['Pacifico'] text-white ml-3 mt-2">Edusync AI</h1>
+</div>
+<nav class="flex-1">
+<a href="#" class="flex items-center space-x-3 p-3 rounded-button bg-primary text-white mb-2">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-home-line"></i>
+</div>
+<span>Home</span>
+</a>
+<a href="#" class="flex items-center space-x-3 p-3 rounded-button text-gray-300 hover:bg-gray-700 mb-2">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-book-line"></i>
+</div>
+<span>My Classes</span>
+</a>
+<a href="#" class="flex items-center space-x-3 p-3 rounded-button text-gray-300 hover:bg-gray-700 mb-2">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-group-line"></i>
+</div>
+<span>Joined Classes</span>
+</a>
+<a href="#" class="flex items-center space-x-3 p-3 rounded-button text-gray-300 hover:bg-gray-700 mb-2">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-line-chart-line"></i>
+</div>
+<span>Progress</span>
+</a>
+<a href="#" class="flex items-center space-x-3 p-3 rounded-button text-gray-300 hover:bg-gray-700 mb-2">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-settings-line"></i>
+</div>
+<span>Settings</span>
+</a>
+</nav>
+<button class="flex items-center space-x-3 p-3 rounded-button text-gray-300 hover:bg-gray-700">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-logout-box-line"></i>
+</div>
+<span>Logout</span>
+</button>
+</aside>
+<main class="flex-1">
+<header class="bg-gray-800 border-b border-gray-700 h-16 flex items-center justify-between px-6">
+<div class="flex items-center flex-1">
+<div class="relative max-w-md w-full">
+<input type="text" placeholder="Search..." class="w-full bg-gray-700 text-gray-200 pl-10 pr-4 py-2 rounded-button border-none text-sm">
+<div class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 flex items-center justify-center text-gray-400">
+<i class="ri-search-line"></i>
+</div>
+</div>
+</div>
+<div class="flex items-center space-x-4">
+<button class="relative w-8 h-8 flex items-center justify-center text-gray-300 hover:text-white">
+<i class="ri-notification-3-line"></i>
+<span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
+</button>
+<div class="relative" id="userMenu">
+<button class="flex items-center space-x-3 cursor-pointer">
+    <img id="profileImage" src="/static/default-profile.png" alt="Profile" class="w-8 h-8 rounded-full object-cover"> 
+    <span id="userName"class="text-sm font-medium">Loading...</span>
+
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-arrow-down-s-line"></i>
+</div>
+</button>
+<div id="userDropdown" class="hidden absolute right-0 mt-2 w-48 bg-gray-800 rounded-button shadow-lg py-1 border border-gray-700">
+<a href="#" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700">Profile</a>
+<a href="#" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700">Settings</a>
+<a href="{% url 'logout' %}" button type="submit" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700">{% csrf_token %}Sign out</a>
+
+</div>
+</div>
+</div>
+</header>
+<div class="p-6">
+<div class="grid grid-cols-1 gap-6">
+<section>
+    <div class="flex items-center justify-between mb-6">
+        <h2 class="text-xl font-semibold">My Classes</h2>
+        <span class="text-sm text-gray-400" id="classCount">Loading...</span>
+    </div>
+    
+    <!-- Classroom List Container -->
+    <div class="grid gap-4" id="classContainer">
+        <p class="text-gray-400" id="loadingText">Loading classrooms...</p>
+    </div>
+    
+    
+    
+    <section>
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="text-xl font-semibold">Joined Classes</h2>
+            <span id="classCount" class="text-sm text-gray-400">0 classes</span>
+        </div>
+    
+        <p id="noClassesMsg" class="text-gray-400 italic" style="display: none;">You haven't joined any classes yet.</p>
+    
+        <div id="joinedClasses" class="grid gap-4">
+            <!-- Dynamically generated class cards will be inserted here -->
+        </div>
+    </section>
+</div>
+</div>
+</main>
+</div>
+<div class="fixed bottom-6 right-6">
+    <!-- FAB Options -->
+    <div id="fabOptions" class="absolute bottom-full right-0 mb-4 hidden flex-col gap-2 transition-all duration-300">
+        <button id="joinClassBtn" class="w-32 h-9 bg-gray-700 hover:bg-gray-600 rounded-full shadow-lg flex items-center justify-center cursor-pointer text-white text-sm transition-all">
+            <i class="ri-user-add-line mr-1 text-base"></i> Join Class
+        </button>
+        <button id="createClassBtn" class="w-32 h-9 bg-blue-600 hover:bg-blue-500 rounded-full shadow-lg flex items-center justify-center cursor-pointer text-white text-sm transition-all">
+            <i class="ri-add-line mr-1 text-base"></i> Create Class
+        </button>
+    </div>
+
+    <!-- Floating Button -->
+    <button id="fabButton" class="w-14 h-14 bg-blue-600 hover:bg-blue-500 rounded-full shadow-lg flex items-center justify-center cursor-pointer transition-all">
+        <i class="ri-add-line text-2xl text-white"></i>
+    </button>
+</div>
+<!-- Join Class Modal -->
+<div id="joinClassModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden transition-all">
+    <div class="bg-gray-800 rounded-lg p-6 w-full max-w-md shadow-lg transform transition-all scale-95">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold text-white">Join a Class</h3>
+            <button class="closeJoinModal text-gray-400 hover:text-white">
+                <i class="ri-close-line text-xl"></i>
+            </button>
+        </div>
+
+        <form id="joinClassForm">
+            <div class="mb-4">
+                <label for="classCode" class="block text-sm font-medium text-gray-300 mb-1">Class Code</label>
+                <input type="text" id="classCode" class="w-full bg-gray-700 text-white px-4 py-2 rounded-md border-none focus:ring-2 focus:ring-blue-500" required>
+            </div>
+
+            <div class="flex justify-end space-x-3">
+                <button type="button" class="closeJoinModal px-4 py-2 text-gray-400 hover:text-white border border-gray-600 rounded-md">Cancel</button>
+                <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-md">Join Class</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Create Class Modal -->
+<div id="createClassModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden transition-all">
+    <div class="bg-gray-800 rounded-lg p-6 w-full max-w-md shadow-lg transform transition-all scale-95">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold text-white">Create New Class</h3>
+            <button class="closeModal text-gray-400 hover:text-white">
+                <i class="ri-close-line text-xl"></i>
+            </button>
+        </div>
+
+        <form id="createClassForm">
+            <div class="mb-4">
+                <label for="className" class="block text-sm font-medium text-gray-300 mb-1">Class Name</label>
+                <input type="text" id="className" class="w-full bg-gray-700 text-white px-4 py-2 rounded-md border-none focus:ring-2 focus:ring-blue-500" required>
+            </div>
+            <div class="mb-4">
+                <label for="classSubject" class="block text-sm font-medium text-gray-300 mb-1">Subject</label>
+                <input type="text" id="classSubject" class="w-full bg-gray-700 text-white px-4 py-2 rounded-md border-none focus:ring-2 focus:ring-blue-500" required>
+            </div>
+
+            <div class="flex justify-end space-x-3">
+                <button type="button" class="closeModal px-4 py-2 text-gray-400 hover:text-white border border-gray-600 rounded-md">Cancel</button>
+                <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-md">Create Class</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+const userMenu = document.getElementById('userMenu');
+const userDropdown = document.getElementById('userDropdown');
+const fabButton = document.getElementById('fabButton');
+const createClassModal = document.getElementById('createClassModal');
+const closeModalButtons = document.querySelectorAll('.closeModal');
+const createClassForm = document.getElementById('createClassForm');
+userMenu.addEventListener('click', function() {
+userDropdown.classList.toggle('hidden');
+});
+document.addEventListener('click', function(event) {
+if (!userMenu.contains(event.target)) {
+userDropdown.classList.add('hidden');
+}
+});
+const createClassBtn = document.getElementById('createClassBtn');
+const joinClassBtn = document.getElementById('joinClassBtn');
+
+createClassBtn.addEventListener('click', function() {
+  createClassModal.classList.add('active');
+});
+
+joinClassBtn.addEventListener('click', function() {
+  // You can add join class modal logic here
+  const notification = document.createElement('div');
+  notification.className = 'fixed bottom-4 right-4 bg-secondary text-white px-6 py-3 rounded-lg shadow-lg';
+  notification.textContent = 'Join class feature coming soon!';
+  document.body.appendChild(notification);
+  setTimeout(() => notification.remove(), 3000);
+});
+closeModalButtons.forEach(button => {
+button.addEventListener('click', function() {
+createClassModal.classList.remove('active');
+});
+});
+createClassForm.addEventListener('submit', function(e) {
+e.preventDefault();
+createClassModal.classList.remove('active');
+const notification = document.createElement('div');
+notification.className = 'fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg';
+notification.textContent = 'Class created successfully!';
+document.body.appendChild(notification);
+setTimeout(() => notification.remove(), 3000);
+});
+});
+document.addEventListener("DOMContentLoaded", function () {
+    const fabButton = document.getElementById("fabButton");
+    const fabOptions = document.getElementById("fabOptions");
+
+    fabButton.addEventListener("click", function () {
+      // Toggle the visibility of the options
+      fabOptions.classList.toggle("hidden");
+    });
+
+    // Optionally, hide options when clicking outside
+    document.addEventListener("click", function (event) {
+      if (!fabButton.contains(event.target) && !fabOptions.contains(event.target)) {
+        fabOptions.classList.add("hidden");
+      }
+    });
+  });
+  async function loadClassrooms() {
+    try {
+        const response = await fetch("/get-user-classes/");
+        const data = await response.json();
+        console.log(data);
+       
+        
+        const classContainer = document.getElementById("classContainer");
+        const classCount = document.getElementById("classCount");
+        classContainer.innerHTML = "";
+
+        if (data.classes.length === 0) {
+            classContainer.innerHTML = "<p class='text-gray-400'>No classrooms created yet.</p>";
+            classCount.textContent = "No classes";
+            return;
+        }
+
+        classCount.textContent = `${data.classes.length} classes`;
+
+        data.classes.forEach(classroom => {
+            const classCard = document.createElement("div");
+            classCard.className = "bg-gray-800 rounded-lg p-4 border border-gray-700";
+            classCard.innerHTML = `
+            <div class="flex justify-between items-start mb-3">
+                <h3 class="text-lg font-medium">${classroom.name} (${classroom.subject})</h3>
+                <button class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-white">
+                    <i class="ri-more-2-fill"></i>
+                </button>
+            </div>
+            <div class="flex items-center text-sm text-gray-400 mb-3">
+                <div class="w-4 h-4 flex items-center justify-center mr-2">
+                    <i class="ri-user-line"></i>
+                </div>
+                <span>Created by: ${data.teacher_name}</span>
+                
+            </div>
+            <div class="flex items-center justify-between">
+                <span id="student-count-${classroom.unique_code}" class="text-xs bg-gray-700 px-2 py-1 rounded-full">
+                    Loading students...
+                </span>
+                
+                <span class="flex items-center text-xs text-green-400">
+                    <i class="ri-time-line mr-1"></i> Active
+                </span>
+                
+            </div>
+            <div class="mt-3">
+                <span>Join Code: ${classroom.unique_code}</span>
+                <a href="/view-classroom/${classroom.unique_code}/" class="bg-blue-500 hover:bg-blue-600 text-white text-sm px-3 py-1 rounded-md">
+                    View Class
+                </a>
+            </div>
+            `;
+            classContainer.appendChild(classCard);
+            loadStudentCount(classroom.unique_code);
+        });
+    } catch (error) {
+        console.error("Error fetching classrooms:", error);
+        document.getElementById("classContainer").innerHTML = "<p class='text-red-500'>Failed to load classrooms.</p>";
+    }
+}
+
+
+async function loadStudentCount(classCode) {
+    try {
+        const response = await fetch(`/api/get_class_students/${classCode}/`);
+        if (!response.ok) {
+            throw new Error(`Failed to fetch students: ${response.status} ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        console.log(`Students in ${classCode}:`, data);  // Debugging log
+
+        const studentCountElement = document.getElementById(`student-count-${classCode}`);
+        if (!studentCountElement) {
+            console.error(`Student count element for class ${classCode} not found.`);
+            return;
+        }
+
+        studentCountElement.textContent = `Students: ${data.students.length}`;
+    } catch (error) {
+        console.error(`Error fetching student count for class ${classCode}:`, error);
+        const studentCountElement = document.getElementById(`student-count-${classCode}`);
+        if (studentCountElement) {
+            studentCountElement.textContent = "Students: Error loading";
+        }
+    }
+}
+
+
+document.addEventListener("DOMContentLoaded", loadClassrooms);
+
+async function loadStudentProfiles(classCode) {
+    try {
+        const response = await fetch(`/api/get_class_students/${classCode}/`);
+        if (!response.ok) {
+            throw new Error(`Failed to fetch students: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        const studentContainer = document.getElementById(`students-${classCode}`);
+
+        if (!studentContainer) {
+            console.error(`Container for class ${classCode} not found.`);
+            return;
+        }
+
+        studentContainer.innerHTML = ""; // Clear previous content
+
+        if (!data.students || data.students.length === 0) {
+            studentContainer.innerHTML = "<p class='text-gray-400 text-xs'>No students yet.</p>";
+            return;
+        }
+
+        // Append student profile pictures
+        data.students.slice(0, 5).forEach(student => {
+            const img = document.createElement("img");
+            img.src = student.profile_picture?.trim() || "/static/default-pfp.png"; // Use default if missing
+            img.alt = student.name;
+            img.className = "w-8 h-8 rounded-full border-2 border-gray-800";
+            studentContainer.appendChild(img);
+        });
+
+        // Show "+X more" if more than 5 students
+        if (data.students.length > 5) {
+            const moreCount = document.createElement("div");
+            moreCount.className = "w-8 h-8 rounded-full bg-gray-700 border-2 border-gray-800 flex items-center justify-center text-xs text-white";
+            moreCount.textContent = `+${data.students.length - 5}`;
+            studentContainer.appendChild(moreCount);
+        }
+
+    } catch (error) {
+        console.error(`Error fetching students for class ${classCode}:`, error);
+        const studentContainer = document.getElementById(`students-${classCode}`);
+        if (studentContainer) {
+            studentContainer.innerHTML = "<p class='text-red-500 text-xs'>Failed to load students.</p>";
+        }
+    }
+}
+function fetchJoinedClasses() {
+    console.log("Fetching joined classes..."); // Debugging log
+    
+    fetch("{% url 'get_joined_classes' %}")  // Ensure this URL is correct
+        .then(response => response.json())
+        .then(data => {
+            console.log("DEBUG: Fetched joined classes:", data);  // Log entire response
+            
+            const joinedClassesDiv = document.getElementById("joinedClasses");
+            const classCount = document.getElementById("classCount");
+            joinedClassesDiv.innerHTML = ""; // Clear existing content
+
+            if (!data || !data.joined_classes || data.joined_classes.length === 0) {
+                document.getElementById("noClassesMsg").style.display = "block";
+                classCount.textContent = "No classes";
+                return;
+            }
+
+            document.getElementById("noClassesMsg").style.display = "none";
+            classCount.textContent = `${data.joined_classes.length} classes`;
+
+            data.joined_classes.forEach(classroom => {
+                const classItem = document.createElement("div");
+                classItem.classList.add("bg-gray-800", "rounded-lg", "p-4", "border", "border-gray-700");
+
+                classItem.innerHTML = `
+                    <div class="flex justify-between items-start mb-3">
+                        <h3 class="text-lg font-medium">${classroom.name} (${classroom.subject})</h3>
+                        <button class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-white">
+                            <i class="ri-more-2-fill"></i>
+                        </button>
+                    </div>
+                    <div class="flex items-center text-sm text-gray-400 mb-3">
+                        <div class="w-4 h-4 flex items-center justify-center mr-2">
+                            <i class="ri-user-line"></i>
+                        </div>
+                        <span>${classroom.instructor || "Unknown Instructor"}</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs bg-gray-700 px-2 py-1 rounded-full">
+                            Next class: ${classroom.nextClass || "TBA"}
+                        </span>
+                        <span class="flex items-center text-xs text-yellow-400">
+                            <i class="ri-time-line mr-1"></i> Upcoming
+                        </span>
+                    </div>
+                    <div class="mt-3">
+                        <a href="/view-classroom/${classroom.unique_code}/" class="bg-blue-500 hover:bg-blue-600 text-white text-sm px-3 py-1 rounded-md">
+                            View Class
+                        </a>
+                    </div>
+                `;
+
+                joinedClassesDiv.appendChild(classItem);
+            });
+        })
+        .catch(error => console.error("Error fetching classes:", error));
+}
+
+document.addEventListener("DOMContentLoaded", fetchJoinedClasses);
+
+async function confirmDeleteAccount() {
+    const confirmDelete = confirm("Are you sure you want to delete your account? This action cannot be undone!");
+    
+    if (confirmDelete) {
+        const response = await fetch("{% url 'delete_account' %}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": "{{ csrf_token }}"
+            }
+        });
+
+        const result = await response.json();
+        if (response.ok) {
+            alert("Your account has been deleted.");
+            window.location.href = "{% url 'base' %}"; // Redirect to login or home page
+        } else {
+            alert(result.error);
+        }
+    }
+}
+document.addEventListener("DOMContentLoaded", async function () {
+    try {
+        const response = await fetch("{% url 'get_user_profile' %}"); // Django API endpoint
+        const data = await response.json();
+
+        console.log("User Profile Data:", data); // Debugging
+
+        if (response.ok) {
+            document.getElementById("userName").textContent ="Welcome"+", "+ data.first_name + " " + data.last_name; // ✅ Display both names
+
+            const profileImage = document.getElementById("profileImage");
+            if (data.profile_picture) {
+                profileImage.src = data.profile_picture; // ✅ Set profile image
+            } else {
+                profileImage.src = "/static/default-profile.png"; // Fallback image
+            }
+        } else {
+            console.error("Error fetching user profile:", data.error);
+        }
+    } catch (error) {
+        console.error("Error loading profile:", error);
+    }
+});
+document.addEventListener("DOMContentLoaded", function () {
+    const fabButton = document.getElementById("fabButton");
+    const fabOptions = document.getElementById("fabOptions");
+    const createClassBtn = document.getElementById("createClassBtn");
+    const createClassModal = document.getElementById("createClassModal");
+    const closeModalBtns = document.querySelectorAll(".closeModal");
+    const createClassForm = document.getElementById("createClassForm");
+
+    // Django URL (ensure this is inside a template file)
+    const createClassURL = "{ % url 'create_classroom' %}}";
+
+    // Toggle FAB menu
+    let isFabOpen = false;
+    fabButton.addEventListener("click", function () {
+        isFabOpen = !isFabOpen;
+        fabOptions.classList.toggle("hidden", !isFabOpen);
+    });
+
+    // Open Create Class Modal
+    createClassBtn.addEventListener("click", function () {
+        createClassModal.classList.remove("hidden");
+    });
+
+    // Close Modal
+    closeModalBtns.forEach(button => {
+        button.addEventListener("click", function () {
+            createClassModal.classList.add("hidden");
+        });
+    });
+
+    // Close modal if clicking outside content
+    createClassModal.addEventListener("click", function (event) {
+        if (!event.target.closest(".modal-content")) {
+            createClassModal.classList.add("hidden");
+        }
+    });
+
+    // Function to get CSRF token from cookies
+    function getCSRFToken() {
+        let cookieValue = null;
+        const cookies = document.cookie.split(";");
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.startsWith("csrftoken=")) {
+                cookieValue = decodeURIComponent(cookie.substring("csrftoken=".length));
+                break;
+            }
+        }
+        return cookieValue;
+    }
+
+    // Handle form submission
+    createClassForm.addEventListener("submit", async function (event) {
+        event.preventDefault();
+
+        const name = document.getElementById("className").value;
+        const subject = document.getElementById("classSubject").value;
+
+        try {
+            const response = await fetch(createClassURL, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": getCSRFToken()
+                },
+                body: JSON.stringify({ name, subject })
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                alert("Classroom Created Successfully!");
+                createClassModal.classList.add("hidden");
+
+                if (typeof loadClassrooms === "function") {
+                    loadClassrooms(); // Ensure function exists before calling
+                }
+            } else {
+                alert(result.error);
+            }
+        } catch (error) {
+            console.error("Error creating classroom:", error);
+            alert("Failed to create classroom. Please try again.");
+        }
+    });
+});
+
+
+document.addEventListener("DOMContentLoaded", function () {
+    const joinClassBtn = document.getElementById("joinClassBtn");
+    const joinClassModal = document.getElementById("joinClassModal");
+    const closeJoinModalBtns = document.querySelectorAll(".closeJoinModal");
+    const joinClassForm = document.getElementById("joinClassForm");
+
+    // Open Join Class Modal
+    joinClassBtn.addEventListener("click", function () {
+        joinClassModal.classList.remove("hidden");
+    });
+
+    // Close Modal
+    closeJoinModalBtns.forEach(button => {
+        button.addEventListener("click", function () {
+            joinClassModal.classList.add("hidden");
+        });
+    });
+
+    // Close modal if clicking outside the content
+    joinClassModal.addEventListener("click", function (event) {
+        if (event.target === joinClassModal) {
+            joinClassModal.classList.add("hidden");
+        }
+    });
+
+    // Handle form submission
+    joinClassForm.addEventListener("submit", function (event) {
+        event.preventDefault();
+
+        const classCode = document.getElementById("classCode").value.trim();
+
+        if (!classCode) {
+            alert("Please enter a class code.");
+            return;
+        }
+
+        console.log("Joining class with code:", classCode); // Debugging log
+
+        fetch("{% url 'join_class' %}", {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": getCookie("csrftoken"), // Ensure CSRF token is included
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: new URLSearchParams({ "class_code": classCode })
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log("Server Response:", data); // Debugging: Log response to console
+            if (data.exists) {
+                if (data.already_joined) {
+                    alert("You have already joined this class.");
+                } else {
+                    alert("Successfully joined the class!");
+                    fetchJoinedClasses(); // Refresh the joined classes list
+                    joinClassModal.classList.add("hidden"); // Close modal upon success
+                }
+            } else {
+                alert("Class not found. Please enter a valid class code.");
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            alert("An error occurred. Please try again.");
+        });
+    });
+
+    // Function to get CSRF token from cookies
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.startsWith(name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+});
+</script>
+</body>
+</html>
+

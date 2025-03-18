@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+{%load socialaccount%}
+{%load static%}
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EduSync.ai - AI-powered Teacher Assistant Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+theme: {
+extend: {
+colors: {
+primary: '#4A90E2',
+secondary: '#6B4FBB'
+},
+borderRadius: {
+'none': '0px',
+'sm': '4px',
+DEFAULT: '8px',
+'md': '12px',
+'lg': '16px',
+'xl': '20px',
+'2xl': '24px',
+'3xl': '32px',
+'full': '9999px',
+'button': '8px'
+}
+}
+}
+}
+</script>
+<style>
+:where([class^="ri-"])::before { content: "\f3c2"; }
+.feature-card:hover { transform: translateY(-5px); }
+.testimonial-card { transition: all 0.3s ease; }
+.pricing-card:hover { transform: scale(1.02); }
+.nav-link { position: relative; }
+.nav-link::after {
+content: '';
+position: absolute;
+width: 0;
+height: 2px;
+bottom: -2px;
+left: 0;
+background-color: #4A90E2;
+transition: width 0.3s;
+box-shadow: 0 0 8px rgba(74, 144, 226, 0.6);
+}
+.nav-link:hover::after { width: 100%; }
+</style>
+</head>
+<body class="bg-gray-900 text-gray-100">
+    
+
+    <div id="signInModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
+        <div class="bg-gray-800 p-8 rounded-xl w-full max-w-md relative">
+            <button id="close-modal" class="absolute top-4 right-4 text-gray-400 hover:text-white">
+                <i class="ri-close-line text-2xl"></i>
+            </button>
+            <h2 class="text-2xl font-bold text-white mb-6">Welcome Back</h2>
+            <div class="space-y-4">
+                <!-- Google Sign-In Button -->
+                <div class="flex justify-center mb-4">
+                    <img src="{% static 'images/bgtemp.png' %}" 
+                         alt="About Edusync AI" 
+                         class="w-70 h-auto rounded">
+                </div>
+                <form action="{% provider_login_url 'google' %}" method="get">
+                    <button type="submit" class="w-full bg-white text-gray-900 hover:bg-gray-100 font-medium rounded-button px-4 py-2 flex items-center justify-center">
+                        <img src="https://img.icons8.com/color/24/google-logo.png" alt="Google Logo" class="mr-2">
+                        Login with Google
+                    </button>
+                </form>
+
+                
+
+                <form id="signInForm" class="space-y-4">
+                    
+                    
+                    
+                </form>
+            </div>
+            
+        </div>
+    </div>
+<nav class="fixed w-full bg-gray-900/90 backdrop-blur-sm z-40 border-b border-gray-800">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex justify-between h-16 items-center">
+<div class="flex-shrink-0 flex items-center">
+<span class="text-3xl font-['Pacifico'] text-primary">Edusync AI</span>
+</div>
+<div class="hidden md:flex space-x-8">
+<a href="#features" class="nav-link text-gray-300 hover:text-primary">Features</a>
+<a href="#how-it-works" class="nav-link text-gray-300 hover:text-primary">How It Works</a>
+<a href="#testimonials" class="nav-link text-gray-300 hover:text-primary">Testimonials</a>
+</div>
+<div class="flex items-center space-x-4">
+    {% if not user.is_authenticated %}
+    <button id="login-btn" class="bg-primary text-white px-4 py-2 rounded">Sign In</button>
+    <button id="start-btn" class="bg-secondary text-white px-4 py-2 rounded">Get Started</button>
+    {% else %}
+        <form action="{% url 'logout' %}" method="post">
+            {% csrf_token %}
+            <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded">Logout</button>
+        </form>
+    {% endif %}
+</div>
+</div>
+</div>
+</nav>
+<section class="pt-32 pb-20 overflow-hidden relative">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="grid lg:grid-cols-2 gap-12 items-center">
+<div class="space-y-8">
+<h1 class="text-5xl font-bold leading-tight text-white">Revolutionizing Education with AI</h1>
+<p class="text-xl text-gray-300">EduSync.ai simplifies teaching, automates tasks, and enhances student learning with AI-powered insights. Join thousands of educators transforming their classrooms.</p>
+<div class="flex space-x-4">
+    
+    {% if not user.is_authenticated %}
+    <button id="login-btn" class="bg-primary text-white px-4 py-2 rounded">Get Started for Free</button>
+    {% else %}
+        <a href="{% url 'home' %}" class="bg-primary text-white hover:bg-primary/90 font-medium !rounded-button px-6 py-3 whitespace-nowrap cursor-pointer">
+            Go to Home
+        </a>
+    {% endif %}
+
+
+<button class="border-2 border-primary text-primary hover:bg-primary/5 font-medium !rounded-button px-6 py-3 whitespace-nowrap cursor-pointer">Learn More</button>
+</div>
+</div>
+<div class="relative">
+<img src="https://public.readdy.ai/ai/img_res/b4a8cabbb09803560b1694bb52a8d213.jpg" alt="AI Teacher Assistant" class="w-full h-auto rounded-xl shadow-2xl">
+</div>
+</div>
+</div>
+</section>
+<section id="features" class="py-20 bg-gray-800">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="text-center mb-16">
+<h2 class="text-4xl font-bold text-white">Powerful Features for Modern Education</h2>
+<p class="mt-4 text-xl text-gray-400">Everything you need to transform your teaching experience</p>
+</div>
+<div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+<div class="feature-card bg-gray-800 p-6 rounded-xl border border-gray-700 transition-all duration-300">
+<div class="w-12 h-12 flex items-center justify-center bg-primary/10 rounded-full mb-4">
+<i class="ri-translate-2-line text-primary text-2xl"></i>
+</div>
+<h3 class="text-xl font-semibold text-white mb-2">Multilingual Support</h3>
+<p class="text-gray-400">Teach in multiple languages with real-time translation and localized content.</p>
+</div>
+<div class="feature-card bg-gray-800 p-6 rounded-xl border border-gray-700 transition-all duration-300">
+<div class="w-12 h-12 flex items-center justify-center bg-primary/10 rounded-full mb-4">
+<i class="ri-check-double-line text-primary text-2xl"></i>
+</div>
+<h3 class="text-xl font-semibold text-white mb-2">Automated Grading</h3>
+<p class="text-gray-400">Save hours with intelligent assessment and instant feedback generation.</p>
+</div>
+<div class="feature-card bg-gray-800 p-6 rounded-xl border border-gray-700 transition-all duration-300">
+<div class="w-12 h-12 flex items-center justify-center bg-primary/10 rounded-full mb-4">
+<i class="ri-line-chart-line text-primary text-2xl"></i>
+</div>
+<h3 class="text-xl font-semibold text-white mb-2">Performance Tracking</h3>
+<p class="text-gray-400">Monitor student progress with detailed analytics and insights.</p>
+</div>
+<div class="feature-card bg-gray-800 p-6 rounded-xl border border-gray-700 transition-all duration-300">
+<div class="w-12 h-12 flex items-center justify-center bg-primary/10 rounded-full mb-4">
+<i class="ri-message-3-line text-primary text-2xl"></i>
+</div>
+<h3 class="text-xl font-semibold text-white mb-2">AI Chat Assistant</h3>
+<p class="text-gray-400">24/7 support for students and teachers with our intelligent chatbot.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="how-it-works" class="py-20 bg-gray-900">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="text-center mb-16">
+<h2 class="text-4xl font-bold text-white">How It Works</h2>
+<p class="mt-4 text-xl text-gray-400">Get started in three simple steps</p>
+</div>
+<div class="grid md:grid-cols-3 gap-8">
+<div class="text-center">
+<div class="w-16 h-16 flex items-center justify-center bg-primary text-white rounded-full mx-auto mb-6 text-2xl font-bold">1</div>
+<h3 class="text-xl font-semibold text-white mb-4">Sign Up</h3>
+<p class="text-gray-400">Create your account in minutes and explore our platform features.</p>
+</div>
+<div class="text-center">
+<div class="w-16 h-16 flex items-center justify-center bg-primary text-white rounded-full mx-auto mb-6 text-2xl font-bold">2</div>
+<h3 class="text-xl font-semibold text-white mb-4">Upload Content</h3>
+<p class="text-gray-400">Import your teaching materials and let AI assist with optimization.</p>
+</div>
+<div class="text-center">
+<div class="w-16 h-16 flex items-center justify-center bg-primary text-white rounded-full mx-auto mb-6 text-2xl font-bold">3</div>
+<h3 class="text-xl font-semibold text-white mb-4">Teach Smarter</h3>
+<p class="text-gray-400">Leverage AI insights to enhance your teaching effectiveness.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="testimonials" class="py-20 bg-gray-800">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="text-center mb-16">
+<h2 class="text-4xl font-bold text-white">What Educators Say</h2>
+<p class="mt-4 text-xl text-gray-400">Join thousands of satisfied teachers worldwide</p>
+<button onclick="openReviewModal()" class="mt-6 bg-primary text-white hover:bg-primary/90 font-medium !rounded-button px-6 py-3 whitespace-nowrap cursor-pointer">Share Your Experience</button>
+</div>
+<div id="reviewModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
+<div class="bg-gray-800 p-8 rounded-xl w-full max-w-md relative">
+<button onclick="closeReviewModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white">
+<i class="ri-close-line text-2xl"></i>
+</button>
+<h2 class="text-2xl font-bold text-white mb-6">Share Your Experience</h2>
+<form id="reviewForm" class="space-y-4">
+<div>
+<label class="block text-gray-300 mb-2">Your Name</label>
+<input type="text" class="w-full bg-gray-700 border-none text-white px-4 py-2 rounded-button" placeholder="Enter your name">
+</div>
+<div>
+<label class="block text-gray-300 mb-2">Your Role</label>
+<input type="text" class="w-full bg-gray-700 border-none text-white px-4 py-2 rounded-button" placeholder="e.g. Math Teacher">
+</div>
+<div>
+<label class="block text-gray-300 mb-2">Your Review</label>
+<textarea class="w-full bg-gray-700 border-none text-white px-4 py-2 rounded-button h-32" placeholder="Share your experience with EduSync.ai"></textarea>
+</div>
+<button type="submit" class="w-full bg-primary text-white hover:bg-primary/90 font-medium rounded-button px-4 py-2">Submit Review</button>
+</form>
+</div>
+</div>
+<div class="grid md:grid-cols-3 gap-8">
+<div class="testimonial-card bg-gray-800 p-6 rounded-xl border border-gray-700">
+<div class="flex items-center mb-4">
+<img src="https://public.readdy.ai/ai/img_res/3fa4c133d46f1a81ac9163ec8c999b4a.jpg" alt="Sarah Mitchell" class="w-12 h-12 rounded-full object-cover">
+<div class="ml-4">
+<h4 class="font-semibold text-white">Sarah Mitchell</h4>
+<p class="text-gray-400">High School Science Teacher</p>
+</div>
+</div>
+<p class="text-gray-300">"EduSync.ai has transformed my teaching approach. The AI-powered lesson planning saves me hours each week, and my students love the interactive features."</p>
+</div>
+<div class="testimonial-card bg-gray-800 p-6 rounded-xl border border-gray-700">
+<div class="flex items-center mb-4">
+<img src="https://public.readdy.ai/ai/img_res/fd9f9137ec01d0e143179af69c2d9451.jpg" alt="Michael Rodriguez" class="w-12 h-12 rounded-full object-cover">
+<div class="ml-4">
+<h4 class="font-semibold text-white">Michael Rodriguez</h4>
+<p class="text-gray-400">Middle School Math Teacher</p>
+</div>
+</div>
+<p class="text-gray-300">"The automated grading system is a game-changer. I can now provide detailed feedback to each student while saving countless hours on assessment."</p>
+</div>
+<div class="testimonial-card bg-gray-800 p-6 rounded-xl border border-gray-700">
+<div class="flex items-center mb-4">
+<img src="https://public.readdy.ai/ai/img_res/f844793bfafcac2ea305684e69f5ec15.jpg" alt="Emily Thompson" class="w-12 h-12 rounded-full object-cover">
+<div class="ml-4">
+<h4 class="font-semibold text-white">Emily Thompson</h4>
+<p class="text-gray-400">Elementary School Teacher</p>
+</div>
+</div>
+<p class="text-gray-300">"The student performance tracking helps me identify areas where each student needs support. It's like having a teaching assistant available 24/7."</p>
+</div>
+</div>
+</div>
+</section>
+<footer class="bg-gray-900 text-white py-12">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="grid md:grid-cols-4 gap-8">
+<div>
+<span class="text-3xl font-['Pacifico'] text-white mb-4 block">logo</span>
+<p class="text-gray-400">Empowering educators with AI-powered tools for better teaching and learning.</p>
+</div>
+<div>
+<h4 class="text-lg font-semibold mb-4">Product</h4>
+<ul class="space-y-2">
+<li><a href="#" class="text-gray-400 hover:text-white">Features</a></li>
+<li><a href="#" class="text-gray-400 hover:text-white">Pricing</a></li>
+<li><a href="#" class="text-gray-400 hover:text-white">Use Cases</a></li>
+</ul>
+</div>
+<div>
+<h4 class="text-lg font-semibold mb-4">Resources</h4>
+<ul class="space-y-2">
+<li><a href="#" class="text-gray-400 hover:text-white">Blog</a></li>
+<li><a href="#" class="text-gray-400 hover:text-white">Help Center</a></li>
+<li><a href="#" class="text-gray-400 hover:text-white">Documentation</a></li>
+</ul>
+</div>
+<div>
+<h4 class="text-lg font-semibold mb-4">Connect</h4>
+<div class="flex space-x-4">
+<a href="#" class="text-gray-400 hover:text-white"><i class="ri-twitter-fill text-xl"></i></a>
+<a href="#" class="text-gray-400 hover:text-white"><i class="ri-linkedin-fill text-xl"></i></a>
+<a href="#" class="text-gray-400 hover:text-white"><i class="ri-facebook-fill text-xl"></i></a>
+</div>
+</div>
+</div>
+<div class="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
+<p>&copy; 2025 EduSync.ai. All rights reserved.</p>
+</div>
+</div>
+</footer>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+const navLinks = document.querySelectorAll('.nav-link');
+navLinks.forEach(link => {
+link.addEventListener('click', (e) => {
+e.preventDefault();
+const targetId = link.getAttribute('href');
+const targetSection = document.querySelector(targetId);
+targetSection.scrollIntoView({ behavior: 'smooth' });
+});
+});
+});
+function openModal() {
+document.getElementById('signInModal').classList.remove('hidden');
+document.body.style.overflow = 'hidden';
+}
+function closeModal() {
+document.getElementById('signInModal').classList.add('hidden');
+document.body.style.overflow = 'auto';
+}
+function openReviewModal() {
+document.getElementById('reviewModal').classList.remove('hidden');
+document.body.style.overflow = 'hidden';
+}
+function closeReviewModal() {
+document.getElementById('reviewModal').classList.add('hidden');
+document.body.style.overflow = 'auto';
+}
+function signInWithGoogle() {
+  // Show success message for demo
+  const successMessage = document.createElement('div');
+  successMessage.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-xl z-50';
+  successMessage.textContent = 'Google Sign In Initiated!';
+  document.body.appendChild(successMessage);
+  setTimeout(() => successMessage.remove(), 3000);
+}
+
+document.getElementById('signInForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  // Add your sign in logic here
+  console.log('Sign in submitted');
+  
+  // Show success message for demo
+  const successMessage = document.createElement('div');
+  successMessage.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-xl z-50';
+  successMessage.textContent = 'Sign in successful!';
+  document.body.appendChild(successMessage);
+  setTimeout(() => successMessage.remove(), 3000);
+  
+  // Close modal
+  closeModal();
+});
+document.getElementById('reviewForm').addEventListener('submit', function(e) {
+e.preventDefault();
+const formData = new FormData(e.target);
+const review = {
+name: formData.get('name'),
+role: formData.get('role'),
+review: formData.get('review')
+};
+// Create new testimonial card
+const testimonialContainer = document.querySelector('#testimonials .grid');
+const newTestimonial = document.createElement('div');
+newTestimonial.className = 'testimonial-card bg-gray-800 p-6 rounded-xl border border-gray-700';
+newTestimonial.innerHTML = `
+<div class="flex items-center mb-4">
+<img src="https://readdy.ai/api/search-image?query=professional headshot portrait, natural lighting, neutral background&width=100&height=100&flag=f684964f784bf070e041426fe7480645&seq=${Date.now()}&orientation=squarish"
+alt="${review.name}"
+class="w-12 h-12 rounded-full object-cover">
+<div class="ml-4">
+<h4 class="font-semibold text-white">${review.name}</h4>
+<p class="text-gray-400">${review.role}</p>
+</div>
+</div>
+<p class="text-gray-300">"${review.review}"</p>
+`;
+// Add new testimonial to the beginning
+testimonialContainer.insertBefore(newTestimonial, testimonialContainer.firstChild);
+closeReviewModal();
+e.target.reset();
+// Show success message
+const successMessage = document.createElement('div');
+successMessage.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-xl z-50';
+successMessage.textContent = 'Thank you for sharing your review!';
+document.body.appendChild(successMessage);
+setTimeout(() => successMessage.remove(), 3000);
+});
+// Close modals when clicking outside
+document.getElementById('signInModal').addEventListener('click', function(e) {
+if (e.target === this) {
+closeModal();
+}
+});
+document.getElementById('reviewModal').addEventListener('click', function(e) {
+if (e.target === this) {
+closeReviewModal();
+}
+});
+document.addEventListener("DOMContentLoaded", function () {
+    const loginBtn = document.getElementById("login-btn");
+    const startBtn = document.getElementById("start-btn");
+    const modal = document.getElementById("signInModal");
+    const closeModal = document.getElementById("close-modal");
+
+    function openModal() {
+        modal.classList.remove("hidden");
+    }
+
+    function closeModalFunc() {
+        modal.classList.add("hidden");
+    }
+
+    loginBtn?.addEventListener("click", openModal);
+    closeModal.addEventListener("click", closeModalFunc);
+
+    startBtn?.addEventListener("click", function () {
+        openModal();
+    });
+});
+document.addEventListener("DOMContentLoaded", function () {
+    const startBtn = document.getElementById("start-btn");
+    const modal = document.getElementById("signInModal");
+
+    const isAuthenticated = {{ user.is_authenticated|lower }}; // Get user auth status from Django
+
+    startBtn.addEventListener("click", function () {
+        if (isAuthenticated) {
+            window.location.href = "/home/"; // Redirect to home page if logged in
+        } else {
+            modal.classList.remove("hidden"); // Show login modal if not logged in
+        }
+    });
+});
+</script>
+</body>
+</html>
+
+    
+    
