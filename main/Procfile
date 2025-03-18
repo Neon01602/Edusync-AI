@@ -1,1 +1,1 @@
-web: gunicorn edusync_ai.wsgi --log-file -
+web: gunicorn edusync_ai.wsgi:application
