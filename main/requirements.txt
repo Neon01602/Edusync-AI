@@ -146,7 +146,7 @@ portalocker==2.10.1
 proglog==0.1.10
 prompt-toolkit==3.0.28
 proto-plus==1.26.0
-protobuf==4.25.3
+protobuf>=5.26.1,<6.0.0
 psutil==6.1.0
 psycopg2-binary==2.9.10
 py-cpuinfo==9.0.0
