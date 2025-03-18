@@ -9,7 +9,7 @@ whitenoise==6.6.0  # Static file handling
 Pillow==10.2.0  # Image handling
 
 # AI & ML Dependencies
-openai==1.17.0  # AI chatbot support
+ # AI chatbot support
 google-generativeai==0.8.4  # Google Gemini integration
 torch==2.2.2  # PyTorch for AI models
 transformers==4.39.1  # NLP processing
@@ -32,6 +32,7 @@ daphne==4.1.0  # ASGI server for WebSockets
 celery==5.3.6  # Background task processing
 redis==5.0.4  # Redis cache for Celery
 
+httpx==0.13.3
 # Logging & Debugging
 sentry-sdk==1.40.2  # Error monitoring
 debugpy==1.8.1  # Debugging support
