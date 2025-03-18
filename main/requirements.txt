@@ -123,7 +123,7 @@ mysql-connector-python==9.0.0
 mysqlclient==2.2.7
 namex==0.0.8
 networkx==2.6.3
-nltk==3.8.2
+nltk==3.8.1
 numpy==1.26.4
 oauthlib==3.2.2
 openai==1.36.1
