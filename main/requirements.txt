@@ -127,7 +127,6 @@ networkx==2.6.3
 nltk==3.8.1
 numpy==1.26.4
 oauthlib==3.2.2
-openai==1.66.3
 opencv-contrib-python==4.10.0.84
 opencv-python==4.9.0.80
 opencv-python-headless==4.10.0.84
