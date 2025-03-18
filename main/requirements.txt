@@ -22,7 +22,7 @@ spacy==3.7.2  # NLP tasks
 
 # HTTP Requests & Web
 requests==2.31.0  # Handling HTTP requests
-httpx==0.26.0  # Required for OpenAI and Google APIs
+  # Required for OpenAI and Google APIs
 
 # Database & Authentication
 mysqlclient==2.2.0  # MySQL support
