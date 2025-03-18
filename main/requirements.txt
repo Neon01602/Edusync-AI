@@ -139,7 +139,7 @@ partd==1.4.2
 pillow==10.4.0
 pillow_heif==0.22.0
 pipdeptree==2.25.1
-playsound==1.3.0
+playsound==1.2.2
 pluggy==1.5.0
 portalocker==2.10.1
 proglog==0.1.10
